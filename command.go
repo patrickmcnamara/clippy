@@ -25,7 +25,7 @@ func (c *Command) check() error {
 	for _, name := range c.Names {
 		for _, char := range name {
 			if !unicode.IsLetter(char) && !unicode.IsNumber(char) && char != '-' {
-				return fmt.Errorf("invalid character in flag name: %q", char)
+				return fmt.Errorf("invalid character in command name: %q in %q", char, name)
 			}
 		}
 	}

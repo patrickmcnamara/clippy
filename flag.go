@@ -9,7 +9,7 @@ import (
 // EmptyValue is an empty value. This is used for flags where the default value should be the empty string.
 var EmptyValue = "\000"
 
-// Flag is a string value given in the command line (or by a default value).
+// Flag is a string value given in the parameters (or by a default value).
 type Flag struct {
 	Name         string // Name of the flag.
 	Alias        rune   // Alias of the flag.

@@ -56,6 +56,7 @@ func (c *Clippy) Run(params []string) {
 	if len(params) >= 1 {
 		if command := c.Commands.get(params[0]); command != nil {
 			parseErr(command.run(params[1:]))
+			return
 		}
 	}
 

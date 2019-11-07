@@ -3,6 +3,7 @@ package clippy
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 // ErrHandler is an error handler that handles an action, parsing, or setup error.
@@ -19,6 +20,10 @@ var (
 )
 
 func defaultErrHandler(name string, err error, exitCode int) {
-	fmt.Fprintln(os.Stderr, fmt.Errorf("%s: %w", name, err))
+	msg := err.Error()
+	if i := strings.IndexRune(msg, ':'); i != -1 && name != msg[:i] {
+		msg = name + ": " + msg
+	}
+	fmt.Fprintln(os.Stderr, msg)
 	os.Exit(exitCode)
 }

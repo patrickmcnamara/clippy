@@ -2,7 +2,6 @@ package clippy
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -27,7 +26,6 @@ func (c *Clippy) Run(params []string) {
 		chkErr = func(err error, errHandler ErrHandler) {
 			if err != nil {
 				errHandler(c.Name, err)
-				os.Exit(4)
 			}
 		}
 

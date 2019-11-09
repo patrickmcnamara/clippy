@@ -38,22 +38,17 @@ func (c *Clippy) Run(params []string) {
 	// Check for errors with commands and flags.
 	setupErr(c.Check())
 
-	// Check for global flags.
-	for _, parameter := range params {
-		switch parameter {
-		case "--help", "-h":
+	// Run subcommand or help or version if it's there.
+	if len(params) >= 1 {
+		p1 := params[0]
+		if command := c.Commands.get(p1); command != nil {
+			parseErr(command.run(c.Name, params[1:]))
+			return
+		} else if p1 == "-h" || p1 == "--help" {
 			fmt.Println(c.help())
 			return
-		case "--version", "-v":
+		} else if p1 == "-v" || p1 == "--version" {
 			fmt.Println(c.version())
-			return
-		}
-	}
-
-	// Run subcommand if it's there.
-	if len(params) >= 1 {
-		if command := c.Commands.get(params[0]); command != nil {
-			parseErr(command.run(params[1:]))
 			return
 		}
 	}
@@ -126,11 +121,9 @@ func (c *Clippy) help() string {
 
 	// USAGE
 	sb.WriteString("USAGE:\n")
-	var usage string
+	usage := "[global flags...] [command] [flags and values...] [arguments...]"
 	if c.Usage != "" {
 		usage = c.Usage
-	} else {
-		usage = "[global flags...] [command] [flags and values...] [arguments...]"
 	}
 	sb.WriteString("\t" + c.Name + " " + usage + "\n\n")
 

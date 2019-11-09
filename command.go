@@ -40,9 +40,15 @@ func (c *Command) check() error {
 	return nil
 }
 
-func (c *Command) run(parameters []string) error {
+func (c *Command) run(name string, params []string) error {
+	// Check for help flag.
+	if len(params) >= 1 && params[0] == "-h" || params[0] == "--help" {
+		fmt.Println(c.help(name))
+		return nil
+	}
+
 	// Parse parameters for flags and arguments.
-	flags, args, err := c.Flags.parse(parameters)
+	flags, args, err := c.Flags.parse(params)
 	if err != nil {
 		return err
 	}
@@ -54,6 +60,43 @@ func (c *Command) run(parameters []string) error {
 
 	// Run action if there is one.
 	return c.Action(flags, args)
+}
+
+func (c *Command) help(name string) string {
+	var sb strings.Builder
+
+	// NAME
+	sb.WriteString("NAME:\n")
+	sb.WriteString("\t" + name + " " + c.Names[0])
+	sb.WriteString("\n\n")
+
+	// DESCRIPTION
+	if c.Description != "" {
+		sb.WriteString("DESCRIPTION:\n")
+		sb.WriteString("\t" + c.Description + "\n\n")
+	}
+
+	// USAGE
+	sb.WriteString("USAGE:\n")
+	usage := "[flags and values...] [arguments...]"
+	if c.Usage != "" {
+		usage = c.Usage
+	}
+	sb.WriteString("\t" + name + " " + c.Names[0] + " " + usage + "\n\n")
+
+	// FLAGS
+	if len(c.Flags) >= 1 {
+		sb.WriteString("FLAG")
+		if len(c.Flags) > 1 {
+			sb.WriteString("S:\n")
+		} else {
+			sb.WriteString(":\n")
+		}
+		sb.WriteString(c.Flags.help("\t"))
+		sb.WriteRune('\n')
+	}
+
+	return strings.TrimRight(sb.String(), "\n")
 }
 
 // CommandSet is a list of Commands.

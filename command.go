@@ -40,10 +40,6 @@ func (c *Command) check() error {
 	return nil
 }
 
-func (c *Command) String() string {
-	return strings.Join(c.Names, ", ") + "\t" + c.Description
-}
-
 func (c *Command) run(parameters []string) error {
 	// Parse parameters for flags and arguments.
 	flags, args, err := c.Flags.parse(parameters)
@@ -62,14 +58,6 @@ func (c *Command) run(parameters []string) error {
 
 // CommandSet is a list of Commands.
 type CommandSet []*Command
-
-func (cs *CommandSet) String() string {
-	var sb strings.Builder
-	for _, command := range *cs {
-		sb.WriteString("\t" + command.String())
-	}
-	return sb.String()
-}
 
 func (cs *CommandSet) check() error {
 	names := make(map[string]struct{})
@@ -100,4 +88,24 @@ func (cs *CommandSet) get(name string) *Command {
 		}
 	}
 	return nil
+}
+
+func (cs *CommandSet) help(indent string) string {
+	var sb strings.Builder
+
+	var width int
+	var names []string
+	for _, cmd := range *cs {
+		name := strings.Join(cmd.Names, ", ")
+		if l := len(name); l > width {
+			width = l
+		}
+		names = append(names, name)
+	}
+
+	for i, cmd := range *cs {
+		sb.WriteString(fmt.Sprintf("%s%-*s%s%s\n", indent, width, names[i], indent, cmd.Description))
+	}
+
+	return sb.String()
 }

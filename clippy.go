@@ -85,10 +85,6 @@ func (c *Clippy) Check() error {
 	return nil
 }
 
-func (c *Clippy) String() string {
-	return c.version()
-}
-
 func (c *Clippy) version() string {
 	return c.Name + " " + c.Version
 }
@@ -152,9 +148,7 @@ func (c *Clippy) help() string {
 		} else {
 			sb.WriteString(":\n")
 		}
-		for _, command := range c.Commands {
-			sb.WriteString("\t" + command.String() + "\n")
-		}
+		sb.WriteString(c.Commands.help("\t"))
 		sb.WriteRune('\n')
 	}
 
@@ -166,9 +160,7 @@ func (c *Clippy) help() string {
 		} else {
 			sb.WriteString(":\n")
 		}
-		for _, flag := range c.Flags {
-			sb.WriteString("\t" + flag.String() + "\n")
-		}
+		sb.WriteString(c.Flags.help("\t"))
 		sb.WriteRune('\n')
 	}
 

@@ -18,21 +18,6 @@ type Flag struct {
 	DefaultValue string // Default value of the flag. If it is left empty, it is assumed that the flag is mandatory and must be given by the user. Use EmptyValue if the default value should be empty.
 }
 
-func (f *Flag) String() string {
-	var sb strings.Builder
-	sb.WriteString("--" + f.Name)
-	if f.Alias != rune(0) {
-		sb.WriteString(", -" + string(f.Alias))
-	}
-	sb.WriteString("\t" + f.Description)
-	if f.DefaultValue == "_" {
-		sb.WriteString(fmt.Sprintf(" (%q)", ""))
-	} else if f.DefaultValue != "" {
-		sb.WriteString(fmt.Sprintf(" (%q)", f.DefaultValue))
-	}
-	return sb.String()
-}
-
 func (f *Flag) check() error {
 	// Check that the flag has a name.
 	if f.Name == "" {
@@ -58,14 +43,6 @@ func (f *Flag) check() error {
 
 // FlagSet is a list of Flags.
 type FlagSet []*Flag
-
-func (fs *FlagSet) String() string {
-	var sb strings.Builder
-	for _, f := range *fs {
-		sb.WriteString("\t" + f.String())
-	}
-	return sb.String()
-}
 
 func (fs *FlagSet) check() error {
 	names := make(map[string]struct{})
@@ -139,4 +116,27 @@ func (fs *FlagSet) parse(params []string) (flags map[string]string, args []strin
 	}
 
 	return
+}
+
+func (fs *FlagSet) help(indent string) string {
+	var sb strings.Builder
+
+	var width int
+	var names []string
+	for _, flag := range *fs {
+		name := "--" + flag.Name
+		if flag.Alias != rune(0) {
+			name += ", -" + string(flag.Alias)
+		}
+		if l := len(name); l > width {
+			width = l
+		}
+		names = append(names, name)
+	}
+
+	for i, flag := range *fs {
+		sb.WriteString(fmt.Sprintf("%s%-*s%s%s\n", indent, width, names[i], indent, flag.Description))
+	}
+
+	return sb.String()
 }
